@@ -13,10 +13,8 @@ public class Wordle {
 
         var engine = new Engine(words);
         engine.nextGuess();
-        engine.setWordStatus("shape", "XXX0X");
-        engine.setWordStatus("share", "XXX0X");
-        engine.setWordStatus("shame", "XXX0X");
-        engine.setWordStatus("shake", "XXX0X");
+        engine.setWordStatus("shape", "00X0Y");
+        engine.setWordStatus("ready", "XXX00");
         System.out.println(engine.nextGuess());
 
     }
