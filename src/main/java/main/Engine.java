@@ -16,7 +16,7 @@ public class Engine {
     private final Map<Character, Set<Integer>> included;
 
     public Engine(List<String> words) {
-        this.words = words.stream().filter(word -> word.length() == 5).collect(Collectors.toList());
+        this.words = words;
         Collections.shuffle(this.words);
         System.out.println(words.size());
         random = new Random();
