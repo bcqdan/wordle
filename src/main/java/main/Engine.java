@@ -24,7 +24,42 @@ public class Engine {
     }
 
     public String nextGuess() {
-        return words.get(random.nextInt(words.size()));
+        var best = new ArrayList<String>();
+        var bestNumVowels = -1;
+        var bestNumLetters = -1;
+        for (var word: words) {
+            var numVowels = getNumDistinctVowels(word);
+            var numLetters = getNumDistinctLetters(word);
+            var replace = false;
+            var add = false;
+            if (numLetters > bestNumLetters) {
+                replace = true;
+            } else if (numLetters == bestNumLetters) {
+                if (numVowels > bestNumVowels) {
+                    replace = true;
+                } else if (numVowels == bestNumVowels) {
+                    add = true;
+                }
+            }
+            if (replace) {
+                bestNumLetters = numLetters;
+                bestNumVowels = numVowels;
+                best.clear();
+                best.add(word);
+            } else if (add) {
+                best.add(word);
+            }
+        }
+        System.out.println("Best: " + best);
+        return best.get(random.nextInt(best.size()));
+    }
+
+    private int getNumDistinctLetters(String word) {
+        return (int) word.chars().distinct().count();
+    }
+
+    private int getNumDistinctVowels(String word) {
+        return (int) word.chars().filter(x -> VOWELS.contains((char) x)).distinct().count();
     }
 
     public void setWordStatus(String word, String status) {

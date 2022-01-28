@@ -12,9 +12,8 @@ public class Wordle {
         var words = lines.stream().map(String::trim).collect(Collectors.toList());
 
         var engine = new Engine(words);
-        engine.nextGuess();
-        engine.setWordStatus("shape", "00X0Y");
-        engine.setWordStatus("ready", "XXX00");
+        engine.setWordStatus("audio", "00000");
+        engine.setWordStatus("terms", "0XX00");
         System.out.println(engine.nextGuess());
 
     }
