@@ -1,10 +1,8 @@
 package main;
 
-import com.google.common.base.Preconditions;
-
 import java.util.*;
 
-public class Engine {
+public class Player {
 
     private static final Set<Character> VOWELS = new HashSet<>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
 
@@ -12,21 +10,24 @@ public class Engine {
     private final Random random;
 
     private final Set<Character> excluded;
-    private final Map<Character, Set<Integer>> included;
+    private final Set<Character> included;
+    private final char[] known;
+    private final Map<Character, Set<Integer>> excludedPositions;
 
-    public Engine(List<String> words) {
-        this.words = words;
-        Collections.shuffle(this.words);
-        random = new Random();
+    public Player(List<String> words, Random random) {
+        this.words = new ArrayList<>(words);
+        this.random = random;
         excluded = new HashSet<>();
-        included = new HashMap<>();
+        included = new HashSet<>();
+        known = new char[5];
+        excludedPositions = new HashMap<>();
     }
 
     public String nextGuess() {
         var best = new ArrayList<String>();
         var bestNumVowels = -1;
         var bestNumLetters = -1;
-        for (var word: words) {
+        for (var word : words) {
             var numVowels = getNumDistinctVowels(word);
             var numLetters = getNumDistinctLetters(word);
             var replace = false;
@@ -49,7 +50,7 @@ public class Engine {
                 best.add(word);
             }
         }
-        System.out.printf("%4d candidates: %s\n", best.size(),  best);
+//        System.out.printf("%4d candidates: %s\n", best.size(),  best);
         return best.get(random.nextInt(best.size()));
     }
 
@@ -62,57 +63,50 @@ public class Engine {
     }
 
     public void setWordStatus(String word, String status) {
-        Preconditions.checkArgument(word.length() == 5);
-        Preconditions.checkArgument(status.length() == 5);
+        assert word.length() == 5;
+        assert status.length() == 5;
         for (int i = 0; i < 5; i++) {
             var c = word.charAt(i);
             var s = status.charAt(i);
             switch (s) {
-                case '0' -> excluded.add(c);
+                case '0' -> {
+                    assert !included.contains(c);
+                    assert !excluded.contains(c);
+                    excluded.add(c);
+                }
                 case 'X' -> {
-                    var set = new HashSet<Integer>();
-                    set.add(i);
-                    included.put(c, set);
+                    assert !excluded.contains(c);
+                    known[i] = c;
+                    included.add(c);
+                    excludedPositions.remove(c);
                 }
                 case 'Y' -> {
-                    if (!included.containsKey(c)) {
-                        var set = new HashSet<>(Arrays.asList(0, 1, 2, 3, 4));
-                        included.put(c, set);
-                    }
-                    included.get(c).remove(i);
+                    assert !excluded.contains(c);
+                    included.add(c);
+                    excludedPositions.computeIfAbsent(c, k -> new HashSet<>()).add(i);
                 }
                 default -> throw new IllegalArgumentException();
             }
         }
         words.removeIf(s -> !filter(s));
-        System.out.printf("%4d remaining: %s\n", words.size(), words);
+        // System.out.printf("%4d remaining: %s\n", words.size(), words);
     }
 
     private boolean filter(String word) {
-        return checkExcluded(word) && checkIncluded(word);
-    }
-
-    private boolean checkIncluded(String word) {
         for (int i = 0; i < 5; i++) {
             var c = word.charAt(i);
-            if (included.containsKey(c)) {
-                var set = included.get(c);
-                if (!set.contains(i)) {
-                    return false;
-                }
+            if (excluded.contains(c)) {
+                return false;
             }
-        }
-        for (var c : included.keySet()) {
-            if (!word.contains("" + c)) {
+            if (known[i] != 0 && known[i] != c) {
+                return false;
+            }
+            if (excludedPositions.containsKey(c) && excludedPositions.get(c).contains(i)) {
                 return false;
             }
         }
-        return true;
-    }
-
-    private boolean checkExcluded(String word) {
-        for (var c : word.toCharArray()) {
-            if (excluded.contains(c)) {
+        for (var c : included) {
+            if (!word.contains(String.valueOf(c))) {
                 return false;
             }
         }
