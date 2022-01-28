@@ -18,6 +18,7 @@ public class Engine {
     public Engine(List<String> words) {
         this.words = words.stream().filter(word -> word.length() == 5).collect(Collectors.toList());
         Collections.shuffle(this.words);
+        System.out.println(words.size());
         random = new Random();
         excluded = new HashSet<>();
         included = new HashMap<>();
