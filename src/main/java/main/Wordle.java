@@ -24,10 +24,10 @@ public class Wordle {
             var guess = player.nextGuess();
             var result = server.guess(guess);
             System.out.printf("%s %s\n", guess, result);
+            player.setWordStatus(guess, result);
             if (result.equals("XXXXX")) {
                 break;
             }
-            player.setWordStatus(guess, result);
         }
 
 
