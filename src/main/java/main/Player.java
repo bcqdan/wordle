@@ -1,6 +1,7 @@
 package main;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Player {
 
@@ -13,6 +14,7 @@ public class Player {
     private final Set<Character> included;
     private final char[] known;
     private final Map<Character, Set<Integer>> excludedPositions;
+    private boolean firstGuess;
 
     public Player(List<String> words, Random random) {
         this.words = new ArrayList<>(words);
@@ -21,45 +23,48 @@ public class Player {
         included = new HashSet<>();
         known = new char[5];
         excludedPositions = new HashMap<>();
+        firstGuess = true;
     }
 
     public String nextGuess() {
-        var best = new ArrayList<String>();
-        var bestNumVowels = -1;
-        var bestNumLetters = -1;
-        for (var word : words) {
-            var numVowels = getNumDistinctVowels(word);
-            var numLetters = getNumDistinctLetters(word);
-            var replace = false;
-            var add = false;
-            if (numLetters > bestNumLetters) {
-                replace = true;
-            } else if (numLetters == bestNumLetters) {
-                if (numVowels > bestNumVowels) {
-                    replace = true;
-                } else if (numVowels == bestNumVowels) {
-                    add = true;
-                }
-            }
-            if (replace) {
-                bestNumLetters = numLetters;
-                bestNumVowels = numVowels;
-                best.clear();
-                best.add(word);
-            } else if (add) {
-                best.add(word);
+        if (firstGuess) {
+            firstGuess = false;
+            return "tares";
+        }
+        var bestScore = -1;
+        var bestGuess = new ArrayList<String>();
+        for (var guess : words) {
+            var score = getScore(guess);
+            if (score > bestScore) {
+                bestScore = score;
+                bestGuess.clear();
+                bestGuess.add(guess);
+            } else if (score == bestScore) {
+                bestGuess.add(guess);
             }
         }
-//        System.out.printf("%4d candidates: %s\n", best.size(),  best);
-        return best.get(random.nextInt(best.size()));
+        return bestGuess.get(random.nextInt(bestGuess.size()));
     }
 
-    private int getNumDistinctLetters(String word) {
-        return (int) word.chars().distinct().count();
+    private int getScore(String guess) {
+        var score = 0;
+        for (var secret : words) {
+            score += getScore(guess, secret);
+        }
+        return score;
     }
 
-    private int getNumDistinctVowels(String word) {
-        return (int) word.chars().filter(x -> VOWELS.contains((char) x)).distinct().count();
+    private int getScore(String guess, String secret) {
+        var score = 0;
+        for (int i = 0; i < 5; i++) {
+            if (guess.charAt(i) == secret.charAt(i)) {
+                score += 1;
+            }
+        }
+        var guessSet = guess.chars().boxed().collect(Collectors.toSet());
+        var secretSet = secret.chars().boxed().collect(Collectors.toSet());
+        guessSet.retainAll(secretSet);
+        return score + guessSet.size();
     }
 
     public void setWordStatus(String word, String status) {
@@ -71,7 +76,6 @@ public class Player {
             switch (s) {
                 case '0' -> {
                     assert !included.contains(c);
-                    assert !excluded.contains(c);
                     excluded.add(c);
                 }
                 case 'X' -> {

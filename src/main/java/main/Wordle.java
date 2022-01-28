@@ -15,13 +15,19 @@ public class Wordle {
         var random = new Random();
         var server = new Server(words, random);
         var player = new Player(words, random);
+
+//        player.setWordStatus("tares", "00XY0");
+//        player.setWordStatus("ferny", "0XX0X");
+//        System.out.println(player.nextGuess());
+
         // 0: exclude letter
         // Y: include letter, wrong position
         // X: include letter, correct position
-
         server.start();
+        var numGuesses = 0;
         while (true) {
             var guess = player.nextGuess();
+            numGuesses++;
             var result = server.guess(guess);
             System.out.printf("%s %s\n", guess, result);
             player.setWordStatus(guess, result);
@@ -29,8 +35,7 @@ public class Wordle {
                 break;
             }
         }
-
-
+        System.out.println("guesses: " + numGuesses);
     }
 
     public static void main(String[] args) throws IOException {
