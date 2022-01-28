@@ -12,6 +12,9 @@ public class Wordle {
         var words = lines.stream().map(String::trim).collect(Collectors.toList());
 
         var engine = new Engine(words);
+        // 0: exclude letter
+        // Y: include letter, wrong position
+        // X: include letter, correct position
         engine.setWordStatus("audio", "00000");
         engine.setWordStatus("terms", "0XX00");
         engine.setWordStatus("perch", "XXX00");
