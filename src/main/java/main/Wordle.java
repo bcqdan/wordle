@@ -15,11 +15,9 @@ public class Wordle {
         // 0: exclude letter
         // Y: include letter, wrong position
         // X: include letter, correct position
-        engine.setWordStatus("audio", "00000");
-        engine.setWordStatus("terms", "0XX00");
-        engine.setWordStatus("perch", "XXX00");
         System.out.println(engine.nextGuess());
-
+        engine.setWordStatus("audio", "000Y0");
+        System.out.println(engine.nextGuess());
     }
 
     public static void main(String[] args) throws IOException {

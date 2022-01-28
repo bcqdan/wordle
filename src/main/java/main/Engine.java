@@ -3,13 +3,12 @@ package main;
 import com.google.common.base.Preconditions;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Engine {
 
     private static final Set<Character> VOWELS = new HashSet<>(Arrays.asList('a', 'e', 'i', 'o', 'u'));
 
-    private List<String> words;
+    private final List<String> words;
     private final Random random;
 
     private final Set<Character> excluded;
@@ -18,7 +17,6 @@ public class Engine {
     public Engine(List<String> words) {
         this.words = words;
         Collections.shuffle(this.words);
-        System.out.println(words.size());
         random = new Random();
         excluded = new HashSet<>();
         included = new HashMap<>();
@@ -51,7 +49,7 @@ public class Engine {
                 best.add(word);
             }
         }
-        System.out.println("Best: " + best);
+        System.out.printf("%4d candidates: %s\n", best.size(),  best);
         return best.get(random.nextInt(best.size()));
     }
 
@@ -87,17 +85,11 @@ public class Engine {
             }
         }
         words.removeIf(s -> !filter(s));
-        System.out.println("Remaining: " + words);
+        System.out.printf("%4d remaining: %s\n", words.size(), words);
     }
 
     private boolean filter(String word) {
-        if (!checkExcluded(word)) {
-            return false;
-        }
-        if (!checkIncluded(word)) {
-            return false;
-        }
-        return true;
+        return checkExcluded(word) && checkIncluded(word);
     }
 
     private boolean checkIncluded(String word) {
