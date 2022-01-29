@@ -29,7 +29,7 @@ public class Player {
     public String nextGuess() {
         if (firstGuess) {
             firstGuess = false;
-            return "tares";
+            return "audio";
         }
         var bestScore = -1;
         var bestGuess = new ArrayList<String>();
@@ -56,11 +56,11 @@ public class Player {
 
     private int getScore(String guess, String secret) {
         var score = 0;
-        for (int i = 0; i < 5; i++) {
-            if (guess.charAt(i) == secret.charAt(i)) {
-                score += 1;
-            }
-        }
+//        for (int i = 0; i < 5; i++) {
+//            if (guess.charAt(i) == secret.charAt(i)) {
+//                score += 1;
+//            }
+//        }
         var guessSet = guess.chars().boxed().collect(Collectors.toSet());
         var secretSet = secret.chars().boxed().collect(Collectors.toSet());
         guessSet.retainAll(secretSet);
@@ -68,6 +68,7 @@ public class Player {
     }
 
     public void setWordStatus(String word, String status) {
+        firstGuess = false;
         assert word.length() == 5;
         assert status.length() == 5;
         for (int i = 0; i < 5; i++) {

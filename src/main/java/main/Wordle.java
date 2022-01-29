@@ -16,14 +16,12 @@ public class Wordle {
         var server = new Server(words, random);
         var player = new Player(words, random);
 
-//        player.setWordStatus("tares", "00XY0");
-//        player.setWordStatus("ferny", "0XX0X");
 //        System.out.println(player.nextGuess());
 
         // 0: exclude letter
         // Y: include letter, wrong position
         // X: include letter, correct position
-        server.start();
+        server.start("could");
         var numGuesses = 0;
         while (true) {
             var guess = player.nextGuess();
